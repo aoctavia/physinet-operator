@@ -1,245 +1,378 @@
-Baik — aku pilihkan **1 project terbaik**, yang **paling strategis**, **paling kompleks**, dan **paling sempurna untuk menjembatani background kamu** (probabilistic ML, generative models, statistical physics, JAX, HPC) **dengan domain vacancy NTNU** (neural operators, hydrodynamics, wave kinematics, sea loads, marine cybernetics).
+# 🌐 **PhysiNet-Operator**
 
-Dan project ini *langsung* meng-address semua poin vacancy:
-
-✔ Neural operators (FNO, DeepFDM, MINO)
-✔ Generative models in function spaces
-✔ Wave kinematics + sea loads
-✔ JAX + synthetic training gym
-✔ PDE-based simulation
-✔ Foundational model
-✔ Real-to-sim validation
-
-Tidak ada project lain yang bisa menjembatani dua dunia kamu (probabilistic ML ↔ marine hydrodynamics) sebaik ini.
+### **A Physics-Informed Neural Operator Framework for Spatiotemporal PDE Fields**
 
 ---
 
-# 🌊 **PROJECT FINAL: MarineWave-Operator (MWO)**
+## 📌 **1. Overview**
 
-### **A Foundational Neural Operator Model for Wave Field + Wave Load Prediction with JAX-based Synthetic Training Gym**
+**PhysiNet-Operator** is a research-grade framework for learning **operator mappings** in spatiotemporal physical systems using **physics-informed neural operators**, **probabilistic generative modeling**, and a **synthetic PDE-based simulation gym built in JAX**.
 
-Ini adalah **foundational model kecil**, versi "mini Marine GPT/KAN" untuk gelombang laut + tarikan gaya ke kapal.
+The project focuses on modeling **partial differential equations (PDEs)** that describe physical processes—such as wave propagation, diffusion, transport, or pattern formation—through a **resolution-invariant neural operator** capable of predicting future states, generating new trajectories, and estimating uncertainty.
 
-Kamu akan membangun:
+PhysiNet-Operator provides:
 
-### **(A) JAX Synthetic Training Gym (WaveGym-JAX)**
-
-* simulator PDE ringan untuk gelombang (shallow water equation / linear wave equation 2D)
-* generate wave elevation fields
-* generate wave velocities
-* generate simplified **ship hull load** data (heave, surge force)
-* time-stepping solver (RK4 / spectral solver)
-* API mirip OpenAI Gym
-
-### **(B) Neural Operator Model (MarineWave-Operator)**
-
-Model hybrid:
-
-1. **FNO (Fourier Neural Operator)**
-   untuk menangkap long-range wave propagation
-
-2. **DeepFDM / Physics-Informed discretization block**
-   bridging your statistical physics background — structured operator!
-
-3. **Generative diffusion head**
-   untuk **uncertainty estimation** → sangat match dengan profil kamu
-
-4. **Multiscale encoder**
-   wave resolution-invariant (bernilai interview!)
-
-Output model:
-
-* next-step wave elevation map
-* 5–10 step rollouts
-* predicted wave loads on ship hull
-* uncertainty maps (variance fields)
-
-### **(C) Real-world generalization component**
-
-* import NOAA wave data / hindcast
-* map to same resolution
-* evaluate generalization gap
+* a JAX-based PDE simulation engine (*PhysiGym*),
+* a multiscale neural operator architecture,
+* a probabilistic generative head for uncertainty estimation,
+* tools for training, visualizing, and evaluating operator learning models.
 
 ---
 
-# 🧠 **Mengapa ini project paling kuat?**
+## 🎯 **2. Motivation**
 
-### **1. Menunjukkan ke NTNU bahwa kamu “bisa PDE marine AI” walau tanpa background marine**
+Modern machine learning is increasingly applied to **physical systems** governed by PDEs.
+Examples include:
 
-Model ini mempelajari:
+* fluid flow, waves, advection-diffusion,
+* reaction–diffusion systems,
+* structural dynamics,
+* climate & geophysical models,
+* large-scale scientific simulation.
 
-* gelombang laut
-* propagasi PDE
-* gaya pada kapal
+Despite these advances, modeling PDE systems requires:
 
-NTNU langsung melihat bahwa kamu “bridgeable”.
+* learning **function-to-function mappings** rather than fixed-size tensors,
+* handling **long-range interactions** and **multiscale structure**,
+* producing **uncertainty-aware predictions**.
 
----
+Neural operators—such as FNO, DeepFDM, MINO, and others—provide a powerful foundation for learning in these settings.
 
-### **2. Selaras 100% dengan poin vacancy**
+PhysiNet-Operator aims to build a **clean, extensible, and research-aligned** implementation that bridges:
 
-Vacancy:
-
-> Develop multiscale (resolution-invariant) AI models for wave kinematics
-> → kamu buat multiscale operator.
-
-Vacancy:
-
-> Survey recent developments in neural operators (FNO, DeepFDM, MINO)
-> → kamu bangun FNO + DeepFDM hybrid.
-
-Vacancy:
-
-> Synthetic training gym using JAX
-> → kamu buat WaveGym-JAX.
-
-Vacancy:
-
-> generative models in function spaces
-> → kamu pakai diffusion/flow head.
-
-Vacancy:
-
-> foundational model for sea state
-> → kamu benar-benar membangun “mini” foundational model.
+* **probabilistic ML**,
+* **neural operator theory**,
+* **differentiable simulation**,
+* **structured physical modeling**,
+  into a single unified framework.
 
 ---
 
-### **3. Menunjukkan sisi probabilistic ML kamu**
+## 🚀 **3. Key Contributions**
 
-Dengan:
+PhysiNet-Operator introduces four core components:
 
-* diffusion / flow head
-* uncertainty-aware rollouts
-* Bayesian-style variance estimation
+### **1. PhysiGym (Synthetic PDE Environment in JAX)**
 
-NTNU akan melihat kamu **unique** dibanding kandidat marine biasa.
+A fully differentiable environment for simulating:
+
+* 2D Wave Equation
+* 2D Heat Equation
+* Advection-Diffusion
+* Gray-Scott Reaction–Diffusion
+
+Features:
+
+* random initial conditions + PDE parameters
+* multiresolution grid support
+* spectral OR finite-difference solvers
+* time rollout generation
+* export to common ML formats (`.npz`)
 
 ---
 
-### **4. Bisa kamu selesaikan dalam 3–6 minggu**
+### **2. Neural Operator Architecture**
 
-Meskipun kompleks, struktur modular membuatnya manageable.
+A hybrid design combining:
+
+* **Multiscale Encoder**
+* **Fourier Neural Operator (FNO)** backbone
+* **Physics-Informed Residual Blocks** (DeepFDM-style)
+* **Probabilistic Generative Head** for uncertainty estimation
+* **Auxiliary PDE feature channels** (boundary masks, coefficients)
+
+Properties:
+
+* resolution-invariant
+* function-space modeling
+* supports rollout prediction & trajectory generation
+* uncertainty-aware (mean + variance or sampling)
 
 ---
 
-# 📁 **Struktur Project GitHub**
+### **3. Training Pipeline**
+
+A modular training system including:
+
+* data loading utilities for PDE trajectories
+* deterministic or probabilistic loss functions
+* rollout consistency checks
+* multiscale random cropping
+* operator learning objectives
+* HPC-friendly training loops using JAX/XLA
+
+---
+
+### **4. Visualization + Analysis Tools**
+
+Tools for:
+
+* plotting PDE fields over time
+* sampling multiple futures (uncertainty)
+* spectral analysis of model representations
+* comparison with classical PDE solvers
+* multiresolution evaluation
+
+---
+
+## 🧩 **4. System Architecture**
 
 ```
-MarineWave-Operator/
-│
-├── wavegym/
-│   ├── env.py                # JAX wave simulator
-│   ├── pde.py                # shallow water / linear wave PDE
-│   ├── hull.py               # ship hull force model
-│   ├── spectral_solver.py    # FFT-based wave propagation
-│   └── utils.py
-│
-├── mwo/
-│   ├── fno.py                # Fourier Neural Operator (JAX/Flax)
-│   ├── deepfdm.py            # physics-informed discretization blocks
-│   ├── multiscale_encoder.py
-│   ├── diffusion_head.py     # generative uncertainty module
-│   ├── operator_model.py     # assembled model
-│   └── train.py
-│
-├── notebooks/
-│   ├── 01_generate_data.ipynb
-│   ├── 02_train_operator.ipynb
-│   ├── 03_visualize_rollouts.ipynb
-│   ├── 04_ship_load_prediction.ipynb
-│   └── 05_uncertainty_maps.ipynb
-│
-├── data/
-│   ├── synthetic/
-│   └── noaa/
-│
-├── README.md
-├── requirements.txt
-└── LICENSE
++---------------------------------------------------------------+
+|                         PhysiNet-Operator                    |
++---------------------------------------------------------------+
+|                                                               |
+|   1. PhysiGym (JAX PDE Simulator)                             |
+|      - 2D wave, diffusion, advection-diffusion, Gray–Scott    |
+|      - random ICs, PDE params                                 |
+|      - rollout generation (T × H × W)                         |
+|                                                               |
+|   2. Data Pipeline                                             |
+|      - Normalization                                           |
+|      - Multiscale cropping                                     |
+|      - Batch formation                                         |
+|                                                               |
+|   3. Neural Operator Model                                     |
+|      +-------------------------------------------------------+ |
+|      |  Multiscale Encoder  -->  FNO Core  -->  Gen. Head    | |
+|      +-------------------------------------------------------+ |
+|               |                          |                     |
+|         future field              uncertainty map              |
+|                                                               |
+|   4. Training & Evaluation                                     |
+|      - operator loss (L2, PDE residuals, KL)                  |
+|      - rollout stability                                       |
+|      - probabilistic sampling                                  |
+|                                                               |
++---------------------------------------------------------------+
 ```
 
 ---
 
-# 📘 **Deskripsi Project (untuk README/CV)**
+## 📦 **5. Modules (Detailed)**
 
-**MarineWave-Operator (MWO)** is a foundational neural operator model for predicting wave elevation fields and wave-induced loads on ships. It combines:
+### **A. PhysiGym**
 
-* Fourier Neural Operators (FNO)
-* Physics-informed discretization (DeepFDM)
-* Multiscale encoders (resolution-invariant)
-* Generative diffusion model for uncertainty quantification
+A JAX-based PDE gym with consistent API:
 
-MWO is trained using **WaveGym-JAX**, a differentiable synthetic training environment implementing simplified hydrodynamic PDEs (shallow water / linear wave equations). The system supports:
+```python
+state = env.reset()
+for t in range(T):
+    state = env.step(state)
+```
 
-* high-resolution wave field generation
-* spectral solvers
-* ship hull force modeling
-* uncertainty-aware multi-step rollouts
+Supports PDE families:
 
-This project bridges **probabilistic machine learning**, **neural operator theory**, and **marine hydrodynamics**, designed to align with modern maritime AI research (e.g., wave kinematics, sea loads, operability prediction).
+* `wave2d`
+* `heat2d`
+* `advection_diffusion2d`
+* `gray_scott2d`
+
+Each generator yields:
+
+* field evolution (T × H × W)
+* PDE coefficients
+* boundary masks (optional)
 
 ---
 
-# 🧱 **Roadmap (6 minggu)**
+### **B. Multiscale Encoder**
 
-### **Week 1–2: WaveGym-JAX**
+Extracts features at multiple resolutions:
 
-* implement 2D wave PDE
-* spectral solver
-* ship hull force model
+```
+u(x,y) → downsampled pyramid → embeddings → combined representation
+```
+
+Benefits:
+
+* captures short- and long-range structure
+* helps operator generalization
+
+---
+
+### **C. FNO Core**
+
+Implements frequency-domain operator learning:
+
+* spectral convolution
+* truncated Fourier modes
+* local pointwise mixing
+* skip connections
+
+---
+
+### **D. Physics-Informed Blocks**
+
+Optional DeepFDM-style residual:
+
+```
+u_pred ≈ u + dt * f(u)          # f(u) learned to mimic PDE behavior
+```
+
+Helps enforce:
+
+* stability
+* physical structure
+* smoother rollouts
+
+---
+
+### **E. Generative Head (Optional)**
+
+Two variants:
+
+1. **Mean + log-variance (Gaussian)**
+2. **Diffusion-based stochastic generator**
+
+   * produce multiple future trajectories
+   * sample physical uncertainty
+
+---
+
+## 📊 **6. Synthetic PDE Dataset Design**
+
+Dataset = collection of spatiotemporal fields generated by PhysiGym.
+
+Example:
+
+* grid sizes: 32×32 / 64×64
+* T = 32–128 timesteps
+* random initial fields (e.g. spectral noise, Gaussian bumps)
+* random PDE coefficients
+* optional noise injection
+
+Output file format:
+
+```
+{
+  "u": [T, H, W],
+  "params": {...},
+  "boundary": [...],
+}
+```
+
+Multiple PDE families can be mixed to encourage generality.
+
+---
+
+## 🏋️ **7. Training Pipeline**
+
+### (1) Operator Learning Objective
+
+Predict:
+
+```
+u(t+1) = G(u(t), conditioning)
+```
+
+Loss:
+
+* L2 per-pixel
+* relative error
+* spectral loss
+* PDE-residual regularization (optional)
+
+### (2) Rollout Training
+
+Predict k steps autoregressively:
+
+```
+u(t+1)->u(t+2)-> ... -> u(t+k)
+```
+
+### (3) Probabilistic Objective (optional)
+
+If using Generative Head:
+
+* KL divergence
+* sampling consistency
+* trajectory ensemble variance
+
+---
+
+## 🧪 **8. Experiments & Evaluation**
+
+### 1. Single-step prediction error
+
+* MSE, MAE, PSNR
+
+### 2. Multi-step rollout stability
+
+Check if prediction diverges or stays stable.
+
+### 3. Resolution generalization
+
+Train at 64×64 → test at 128×128.
+
+### 4. Parameter generalization
+
+Sample PDE coefficients (e.g. wave speed `c`).
+
+### 5. Uncertainty calibration
+
+* compare ensemble mean with ground truth
+* sharpness vs calibration
+
+---
+
+## 📅 **9. 6-Week Development Roadmap**
+
+### **Week 1 — PhysiGym (PDE Simulator)**
+
+* implement wave, heat, advection-diffusion
+* random initial conditions
 * dataset generator
 
-### **Week 3: Neural Operator base**
+### **Week 2 — Data Pipeline**
 
-* FNO
-* multiscale blocks
-* training loop
+* normalization
+* multiscale cropping
+* batching
 
-### **Week 4: Add DeepFDM physics-informed module**
+### **Week 3 — Multiscale Encoder + FNO**
 
-* finite-difference residual supervision
-* hybrid operator fusion
+* encoder
+* spectral conv
+* FNO block
+* basic training loop
 
-### **Week 5: Generative diffusion head + uncertainty**
+### **Week 4 — Physics-Informed Blocks**
 
-* probabilistic rollouts
-* sample trajectories
-* variance maps
+* DeepFDM residual
+* stability improvements
 
-### **Week 6: Experiments + Visualization**
+### **Week 5 — Generative Head**
 
-* real-world hindcast validation
-* marine load prediction demo
-* rollout comparison
-* uncertainty over time
+* Gaussian head
+* diffusion head (optional)
+* uncertainty sampling
 
----
+### **Week 6 — Experiments + Visualization**
 
-# 🎯 **Ringkasan: Kenapa aku pilih project ini?**
-
-Karena **project ini langsung menjawab semua kebutuhan vacancy**,
-dan yang paling penting:
-
-### 💡 Project ini memadukan:
-
-* machine learning operator theory (bidangmu)
-* physics and PDE structure (relevan NTNU)
-* wave & ship-load modelling (domain vacancy)
-* probabilistic generative modeling (keunikanmu)
-
-**Tidak ada kandidat biasa dari Marine Technology yang bisa membuat project seperti ini.**
-Kamu akan standout sebagai “probabilistic ML + physical modeling hybrid researcher”.
+* rollout tests
+* resolution scaling
+* uncertainty visualization
+* final documentation
 
 ---
 
-# 🌟 Kalau kamu mau, aku bisa buatkan:
+## 🎓 **10. Why This Project Has Strong Research Value**
 
-* **README lengkap**
-* **abstrak ilmiah**
-* **diagram arsitektur**
-* **baseline kode awal (JAX FNO + PDE solver)**
-* **kalimat untuk motivation letter** yang merujuk project ini
+This project touches active research themes:
 
-Cukup bilang:
-**“Ya, buatkan wavegym-jax + operator model README + diagram + kode awal.”**
+* operator learning
+* physics-informed ML
+* PDE modeling
+* generative modeling for physical systems
+* uncertainty estimation
+* JAX/XLA HPC pipelines
+
+It demonstrates:
+
+* modeling theory
+* engineering execution
+* understanding of physical structure
+* probabilistic reasoning
+
+---
