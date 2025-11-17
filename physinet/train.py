@@ -6,8 +6,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from flax.training import train_state
+from flax.serialization import to_bytes
 import optax
-from typing import Dict
 
 from .model import PhysiNetOperator
 from .data import load_pde_dataset
@@ -17,37 +17,28 @@ class TrainState(train_state.TrainState):
     pass
 
 
-def create_train_state(
-    rng,
-    example_x: jnp.ndarray,
-    lr: float = 1e-3,
-    probabilistic: bool = False,
-) -> TrainState:
+def create_train_state(rng, example_x, lr=1e-3, probabilistic=False):
     model = PhysiNetOperator(probabilistic=probabilistic)
-    params = model.init(rng, example_x)["params"]
+    variables = model.init(rng, example_x)
+    params = variables["params"]
+
     tx = optax.adam(lr)
-    return TrainState(
+
+    state = TrainState.create(
         apply_fn=model.apply,
         params=params,
         tx=tx,
     )
+    return state
 
 
 @jax.jit
-def train_step(
-    state: TrainState,
-    batch_x: jnp.ndarray,
-    batch_y: jnp.ndarray,
-) -> (TrainState, float, Dict[str, jnp.ndarray]):
-    """
-    batch_x: [B, seq_len, H, W]
-    batch_y: [B, H, W]
-    """
+def train_step(state, batch_x, batch_y):
     def loss_fn(params):
-        x_in = batch_x[:, -1, :, :, None]  # use last frame only (simple baseline)
+        x_in = batch_x[:, -1, :, :, None]
         outputs = state.apply_fn({"params": params}, x_in)
 
-        mean = outputs["mean"][..., 0]  # [B, H, W]
+        mean = outputs["mean"][..., 0]
         mse = jnp.mean((mean - batch_y) ** 2)
         return mse, {"mse": mse}
 
@@ -56,18 +47,13 @@ def train_step(
     return state, loss, metrics
 
 
-def main(
-    data_dir: str = "data/synthetic",
-    epochs: int = 10,
-    batch_size: int = 8,
-    seq_len: int = 4,
-    lr: float = 1e-3,
-):
+def main(data_dir="data/synthetic", epochs=10, batch_size=8, seq_len=4, lr=1e-3):
+
     xs, ys = load_pde_dataset(data_dir, seq_len=seq_len, field_key="u")
     N, T, H, W = xs.shape
 
     rng = jax.random.PRNGKey(0)
-    example_x = jnp.array(xs[0:1, -1, :, :])[..., None]  # [1, H, W, 1]
+    example_x = jnp.array(xs[0:1, -1, :, :])[..., None]
     state = create_train_state(rng, example_x, lr=lr)
 
     num_batches = N // batch_size
@@ -90,10 +76,9 @@ def main(
         epoch_loss /= max(1, num_batches)
         print(f"[Epoch {epoch+1}/{epochs}] loss={epoch_loss:.6e}")
 
-    # TODO: save params if needed
-    # from flax.serialization import to_bytes
-    # with open("physinet_params.msgpack", "wb") as f:
-    #     f.write(to_bytes(state.params))
+    print("Saving model → physinet_params.msgpack ...")
+    with open("physinet_params.msgpack", "wb") as f:
+        f.write(to_bytes(state.params))
 
 
 if __name__ == "__main__":
@@ -101,7 +86,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", type=str, default="data/synthetic")
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch_size", type=int, default=8)
     parser.add_argument("--seq_len", type=int, default=4)
     parser.add_argument("--lr", type=float, default=1e-3)

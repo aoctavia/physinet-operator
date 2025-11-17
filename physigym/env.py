@@ -96,8 +96,19 @@ class PhysiGym:
         states = []
         for _ in range(cfg.steps):
             states.append(np.array(eta))
-            eta, eta_t = wave_step(eta, eta_t, cfg)
+
+            # PATCH: wave_step without cfg object
+            eta, eta_t = wave_step(
+                eta,
+                eta_t,
+                cfg.c,
+                cfg.length_x / cfg.nx,
+                cfg.length_y / cfg.ny,
+                cfg.dt,
+            )
+
         return {"u": np.stack(states, axis=0)}
+
 
     def _roll_out_heat(self) -> Dict[str, np.ndarray]:
         cfg = self.cfg.heat
