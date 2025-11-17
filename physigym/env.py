@@ -1,8 +1,9 @@
 # physigym/env.py
 
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, Dict
+
 
 import os
 from pathlib import Path
@@ -23,9 +24,10 @@ PDEType = Literal["wave2d", "heat2d", "gray_scott"]
 @dataclass
 class EnvConfig:
     pde_type: PDEType = "wave2d"
-    wave: WaveConfig = WaveConfig()
-    heat: HeatConfig = HeatConfig()
-    gray_scott: ReactionDiffusionConfig = ReactionDiffusionConfig()
+    wave: WaveConfig = field(default_factory=WaveConfig)
+    heat: HeatConfig = field(default_factory=HeatConfig)
+    gray_scott: ReactionDiffusionConfig = field(default_factory=ReactionDiffusionConfig)
+
 
 
 class PhysiGym:

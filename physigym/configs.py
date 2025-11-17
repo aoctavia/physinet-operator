@@ -30,3 +30,4 @@ class ReactionDiffusionConfig(PDEConfig):
     Dv: float = 0.08
     F: float = 0.035
     k: float = 0.065
+
