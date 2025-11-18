@@ -7,7 +7,7 @@ import jax
 import jax.numpy as jnp
 
 
-@dataclass
+@dataclass(frozen=True)
 class WaveParams:
     dt: float = 0.01
     g: float = 9.81
@@ -17,17 +17,16 @@ class WaveParams:
 
 
 def laplacian_periodic(u: jnp.ndarray) -> jnp.ndarray:
-    up = jnp.roll(u, -1, axis=0)
-    down = jnp.roll(u, +1, axis=0)
-    left = jnp.roll(u, -1, axis=1)
+    up    = jnp.roll(u, -1, axis=0)
+    down  = jnp.roll(u, +1, axis=0)
+    left  = jnp.roll(u, -1, axis=1)
     right = jnp.roll(u, +1, axis=1)
     return up + down + left + right - 4.0 * u
 
 
-@jax.jit(static_argnums=(2,))
-def wave_step_hos(eta: jnp.ndarray, phi: jnp.ndarray, params: WaveParams):
+def _wave_step_hos_impl(eta: jnp.ndarray, phi: jnp.ndarray, params: WaveParams):
     """
-    Simplified HOS-style nonlinear free-surface model.
+    Simplified HOS-like nonlinear free-surface model.
     """
 
     # Gradients
@@ -49,3 +48,10 @@ def wave_step_hos(eta: jnp.ndarray, phi: jnp.ndarray, params: WaveParams):
     phi_next = phi + params.dt * phi_t
 
     return eta_next, phi_next
+
+
+# ✔ JIT dengan static params
+wave_step_hos = jax.jit(
+    _wave_step_hos_impl,
+    static_argnums=(2,),   # makes params static
+)
