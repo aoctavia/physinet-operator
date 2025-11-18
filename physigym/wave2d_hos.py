@@ -1,3 +1,6 @@
+# physigym/wave2d_hos.py
+
+from __future__ import annotations
 from dataclasses import dataclass
 
 import jax
@@ -7,43 +10,42 @@ import jax.numpy as jnp
 @dataclass
 class WaveParams:
     dt: float = 0.01
-    c: float = 1.0
+    g: float = 9.81
+    depth: float = 50.0
+    nx: int = 64
+    ny: int = 64
 
 
-def laplacian_2d(u):
+def laplacian_periodic(u: jnp.ndarray) -> jnp.ndarray:
+    up = jnp.roll(u, -1, axis=0)
+    down = jnp.roll(u, +1, axis=0)
+    left = jnp.roll(u, -1, axis=1)
+    right = jnp.roll(u, +1, axis=1)
+    return up + down + left + right - 4.0 * u
+
+
+@jax.jit(static_argnums=(2,))
+def wave_step_hos(eta: jnp.ndarray, phi: jnp.ndarray, params: WaveParams):
     """
-    u: [H, W]
+    Simplified HOS-style nonlinear free-surface model.
     """
-    # periodic padding
-    u_pad = jnp.pad(u, ((1, 1), (1, 1)), mode="wrap")
-    return (
-        u_pad[1:-1, 2:] + u_pad[1:-1, :-2] + u_pad[2:, 1:-1] + u_pad[:-2, 1:-1] - 4.0 * u
-    )
 
+    # Gradients
+    dphi_dx = 0.5 * (jnp.roll(phi, -1, axis=0) - jnp.roll(phi, 1, axis=0))
+    dphi_dy = 0.5 * (jnp.roll(phi, -1, axis=1) - jnp.roll(phi, 1, axis=1))
 
-@jax.jit
-def wave_step(u, v, params: WaveParams):
-    """
-    Simple second-order wave equation:
-    ∂u/∂t = v
-    ∂v/∂t = c^2 ∇^2 u
-    """
-    du = v
-    dv = (params.c ** 2) * laplacian_2d(u)
-    u_next = u + params.dt * du
-    v_next = v + params.dt * dv
-    return u_next, v_next
+    deta_dx = 0.5 * (jnp.roll(eta, -1, axis=0) - jnp.roll(eta, 1, axis=0))
+    deta_dy = 0.5 * (jnp.roll(eta, -1, axis=1) - jnp.roll(eta, 1, axis=1))
 
+    # Free-surface evolution
+    eta_t = - (dphi_dx * deta_dx + dphi_dy * deta_dy)
 
-def simulate_wave(u0, v0, params: WaveParams, steps: int):
-    """
-    u0, v0: [H, W]
-    returns: [T, H, W] (trajectory of u)
-    """
-    def body(carry, _):
-        u, v = carry
-        u_next, v_next = wave_step(u, v, params)
-        return (u_next, v_next), u_next
+    # Bernoulli equation
+    grad_phi_sq = dphi_dx**2 + dphi_dy**2
+    phi_t = - params.g * eta - 0.5 * grad_phi_sq
 
-    (_, _), us = jax.lax.scan(body, (u0, v0), None, length=steps)
-    return us  # [T,H,W]
+    # Euler step
+    eta_next = eta + params.dt * eta_t
+    phi_next = phi + params.dt * phi_t
+
+    return eta_next, phi_next
