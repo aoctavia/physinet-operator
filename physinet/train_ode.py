@@ -4,8 +4,8 @@ import os
 import torch
 from torch.utils.data import DataLoader
 
-from physinet.model.marine_fno import MarineFNO
-from physinet.model.operator_ode import OperatorODE, integrate_trajectory
+from physinet.models.marine_fno import MarineFNO
+from physinet.models.operator_ode import OperatorODE, integrate_trajectory
 from physinet.data.real_data_loader import NPZWaveDataset
 
 

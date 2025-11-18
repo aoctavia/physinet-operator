@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from physinet.model.diffusion_model import DiffusionWaveModel
+from physinet.models.diffusion_model import DiffusionWaveModel
 from physinet.data.real_data_loader import NPZWaveDataset
 
 

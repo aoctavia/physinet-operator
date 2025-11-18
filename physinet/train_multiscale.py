@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from physinet.model.ms_fno import MultiscaleFNO
+from physinet.models.ms_fno import MultiscaleFNO
 from physinet.losses.physics_losses import wave_pde_residual
 from physinet.data.real_data_loader import NPZWaveDataset
 
