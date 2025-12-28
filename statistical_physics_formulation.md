@@ -1,145 +1,150 @@
-# Statistical Physics Formulation for PDE Operator Learning
+# 📘 Statistical Physics Formulation for PDE Operator Learning
 
-This document summarizes the **statistical physics and probabilistic formulation** underlying *PhysiNet-Operator*, focusing on **spatiotemporal PDE fields** and **neural operator learning**.
+This document summarizes the **statistical physics and probabilistic formulation** underlying *PhysiNet-Operator*, focusing on **spatiotemporal PDE fields** and **neural operator learning in function space**.
 
-The goal is to connect:
+The aim is to connect:
 
 * **PDE-governed dynamics**
 * **probabilistic modeling**
-* **operator learning in function space**
+* **neural operator learning**
 * **uncertainty estimation**
 
-into a single mathematical framework.
+into a unified mathematical framework.
 
 ---
 
-## 1. PDE Fields as Random Functions
+## 1️⃣ PDE Fields as Random Functions
 
-Let a physical field be:
+Consider a physical field
 
-[
-u(x,t)\in \mathbb{R}, \quad x\in\Omega\subset\mathbb{R}^d,; t\ge 0
-]
+$$
+u(x,t)\in \mathbb{R},
+\quad
+x\in\Omega\subset\mathbb{R}^d,;
+t\ge 0
+$$
 
-governed by a PDE:
+governed by a PDE
 
-[
-\mathcal{F}\left(u,\frac{\partial u}{\partial t}, \nabla u,\nabla^2 u,\dots;,\theta\right)=0
-]
+$$
+\mathcal{F}!\left(
+u,
+\frac{\partial u}{\partial t},
+\nabla u,
+\nabla^2 u,\dots;,
+\theta
+\right)=0
+$$
 
-where:
+where
 
-* (\mathcal{F}): PDE operator
-* (\theta): physical parameters
-* (\Omega): spatial domain
+* $\mathcal{F}$ = PDE operator
+* $\theta$ = physical parameters
+* $\Omega$ = domain
 
 Examples:
 
-| System              | PDE                                           |
-| ------------------- | --------------------------------------------- |
-| Heat                | (\partial_t u = D\nabla^2 u)                  |
-| Wave                | (\partial_{tt} u = c^2\nabla^2 u)             |
-| Advection-Diffusion | (\partial_t u + v\cdot\nabla u = D\nabla^2 u) |
-| Gray-Scott          | Reaction-diffusion system                     |
+| System              | PDE                                          |
+| ------------------- | -------------------------------------------- |
+| Heat                | $\partial_t u = D\nabla^2 u$                 |
+| Wave                | $\partial_{tt}u = c^2\nabla^2u$              |
+| Advection–Diffusion | $\partial_t u + v\cdot\nabla u = D\nabla^2u$ |
+| Gray-Scott          | Reaction–diffusion                           |
 
 ---
 
-## 2. Operator Learning Objective
+## 2️⃣ Operator Learning Objective
 
-We learn an operator mapping:
+We learn a **function-space operator**
 
-[
-\mathcal{G}:; u_0(x);\mapsto;u(x,t)
-]
+$$
+\mathcal{G}: u_0(x)\mapsto u(x,t)
+$$
 
-or equivalently time-step evolution:
+or, in discrete time:
 
-[
+$$
 u_{t+1} = \mathcal{G}(u_t,\theta)
-]
+$$
 
-A neural operator approximator:
+A neural operator approximates
 
-[
+$$
 \hat{\mathcal{G}}_\phi \approx \mathcal{G}
-]
+$$
 
-where (\phi) are trainable parameters.
+with parameters $\phi$.
 
 Unlike CNNs,
-[
-\hat{\mathcal{G}}_\phi:;\mathcal{H}\to\mathcal{H}
-]
-acts on **function spaces**, not finite tensors.
+
+$$
+\hat{\mathcal{G}}_\phi:\mathcal{H}\rightarrow\mathcal{H}
+$$
+
+acts on **infinite-dimensional spaces**
+→ enabling **resolution-invariant prediction**.
 
 ---
 
-## 3. Probabilistic Formulation
+## 3️⃣ Probabilistic Formulation
 
-We treat field evolution as **a stochastic process**:
+We treat field evolution as **a stochastic process**
 
-[
+$$
 p(u_{t+1}\mid u_t,\theta)
-]
+$$
 
-A deterministic model gives:
+Deterministic operator:
 
-[
+$$
 u_{t+1} = \hat{\mathcal{G}}_\phi(u_t)
-]
+$$
 
-A **probabilistic model** gives:
+Probabilistic operator:
 
-[
+$$
 u_{t+1}\sim p_\phi(\cdot\mid u_t)
-]
+$$
 
-Examples:
+Gaussian case:
 
-* Gaussian output:
-
-[
+$$
 p_\phi(u_{t+1}\mid u_t)
 =======================
 
 \mathcal{N}
-\left(
+!\Big(
 \mu_\phi(u_t),
 \Sigma_\phi(u_t)
-\right)
-]
+\Big)
+$$
 
-* diffusion-based sampler
-* latent variable models
-
-Uncertainty is encoded in:
+This supports:
 
 ✔ process noise
-✔ parametric uncertainty
 ✔ epistemic uncertainty
+✔ parameter uncertainty
 
 ---
 
-## 4. Statistical Physics Viewpoint
+## 4️⃣ Statistical Physics Viewpoint
 
-### Field distribution
+Define a probability distribution over fields
 
-We define a probability functional:
+$$
+P[u]
+\propto
+e^{-\beta\mathcal{H}[u]}
+$$
 
-[
-P[u] \propto e^{-\beta \mathcal{H}[u]}
-]
+where
 
-where:
+* $\mathcal{H}[u]$ = Hamiltonian functional
+* $\beta = (k_BT)^{-1}$
 
-* (\mathcal{H}[u]): Hamiltonian functional
-* (\beta = (k_BT)^{-1})
+Example (Ginzburg–Landau-type)
 
-For PDE systems, (\mathcal{H}) depends on gradients:
-
-Example (Ginzburg–Landau-type):
-
-[
+$$
 \mathcal{H}[u]
 ==============
 
@@ -151,162 +156,165 @@ Example (Ginzburg–Landau-type):
 V(u)
 \right]
 dx
-]
+$$
 
-Expected physical observable:
+Expectation of observable:
 
-[
+$$
 \langle A[u]\rangle
 ===================
 
 \int
 \mathcal{D}u;
-A[u],P[u]
-]
+A[u],
+P[u]
+$$
 
-This matches **Bayesian operator learning**.
+This parallels **Bayesian learning over functions**.
 
 ---
 
-## 5. Neural Operator as a Learned Transition Kernel
+## 5️⃣ Neural Operator as Transition Kernel
 
-Neural operator models approximate:
+Neural operators approximate
 
-[
+$$
 p(u_{t+1}\mid u_t)
-]
+$$
 
-Rollout sequence:
+Joint distribution:
 
-[
+$$
 p(u_{0:T})
 ==========
 
 \prod_{t=0}^{T-1}
 p(u_{t+1}\mid u_t)
-]
+$$
 
 Training objective:
 
-[
+$$
 \mathcal{L}
 ===========
 
-* \sum_{t}
-  \log
-  p_\phi(u_{t+1}\mid u_t)
-  ]
+*
 
-For Gaussian models:
+\sum_t
+\log
+p_\phi(u_{t+1}\mid u_t)
+$$
 
-[
+Gaussian NLL:
+
+$$
 \mathcal{L}
 ===========
 
 \sum_t
-\frac{|u_{t+1}-\mu_\phi(u_t)|^2}{2\sigma_\phi^2}
+\frac{
+|u_{t+1}-\mu_\phi(u_t)|^2
+}
+{2\sigma_\phi^2}
 +
 \log\sigma_\phi
-]
+$$
 
 ---
 
-## 6. Spectral Representation & FNO
+## 6️⃣ Spectral Representation & FNO
 
-A field is expressed in Fourier basis:
+Represent field in Fourier basis
 
-[
+$$
 u(x)
 ====
 
 \sum_k
 \hat{u}_k
-e^{ik\cdot x}
-]
+,e^{ik\cdot x}
+$$
 
-The neural operator applies **spectral convolution**:
+Neural operator applies
 
-[
+$$
 \hat{u}'_k
 ==========
 
-R_\phi(k),\hat{u}_k
-]
+R_\phi(k),
+\hat{u}_k
+$$
 
-where (R_\phi) is learned.
+where $R_\phi(k)$ is learned.
 
-This mimics **Green’s function operators**.
+This mimics
 
-Low-frequency truncation encodes:
+➡ Green’s function operators
+➡ long-range coupling
 
-✔ smoothness
-✔ long-range propagation
+Low-frequency truncation enforces smoothness.
 
 ---
 
-## 7. Physics-Informed Residual Formulation
+## 7️⃣ Physics-Informed Residual Modeling
 
-We model PDE dynamics like:
+We learn dynamics in residual form:
 
-[
+$$
 u_{t+1}
 \approx
 u_t
 +
-\Delta t;
+\Delta t,
 f_\phi(u_t)
-]
+$$
 
-similar to numerical solvers:
+analogous to
 
-[
-\partial_t u
-\approx
-f_\phi(u)
-]
+$$
+\partial_t u = f(u)
+$$
 
 This improves:
 
 * stability
-* physical consistency
-* rollout smoothness
+* physical coherence
+* long-rollout behavior
 
 ---
 
-## 8. Loss Functions
+## 8️⃣ Loss Functions
 
-### Data Loss
+### Data loss
 
-[
-\mathcal{L}_{\text{data}}
-=========================
+$$
+\mathcal{L}_{data}
+==================
 
 |u_{pred}-u_{true}|_2^2
-]
+$$
 
-### Spectral Loss
+### Spectral loss
 
-[
-\mathcal{L}_{\text{freq}}
-=========================
+$$
+\mathcal{L}_{freq}
+==================
 
 |\hat{u}*{pred}-\hat{u}*{true}|_2^2
-]
+$$
 
-### PDE-Residual Loss (optional)
+### PDE residual loss
 
-[
-\mathcal{L}_{\text{PDE}}
-========================
+$$
+\mathcal{L}_{PDE}
+=================
 
-\left|
-\mathcal{F}(u_{pred})
-\right|_2^2
-]
+|\mathcal{F}(u_{pred})|_2^2
+$$
 
-Total:
+### Total loss
 
-[
+$$
 \mathcal{L}
 ===========
 
@@ -315,94 +323,91 @@ Total:
 \lambda*{freq}\mathcal{L}*{freq}
 +
 \lambda*{PDE}\mathcal{L}_{PDE}
-]
+$$
 
 ---
 
-## 9. Uncertainty Quantification
+## 9️⃣ Uncertainty Quantification
 
-Variance of predictive distribution:
+Predictive variance
 
-[
+$$
 \mathrm{Var}(u)
 ===============
 
 ## \mathbb{E}[u^2]
 
 \mathbb{E}[u]^2
-]
+$$
 
-Calibration metrics include:
+Metrics:
 
-* ensemble spread
 * negative log-likelihood
+* ensemble calibration
 * CRPS
 
 ---
 
-## 10. Resolution-Invariant Property
+## 🔟 Resolution-Invariant Property
 
-Operator learning acts on function space:
+Neural operators act on functions
 
-[
+$$
 u(x)\rightarrow v(x)
-]
+$$
 
-so models generalize across grids:
+so models generalize across grids
 
-[
-64^2 \rightarrow 128^2
-]
+$$
+64^2 ;\rightarrow; 128^2
+$$
 
 This is critical for **scientific ML**.
 
 ---
 
-## 🔬 11. Evaluation Criteria
+## 1️⃣1️⃣ Evaluation Criteria
 
-### Single-Step Error
+Single-step error
 
-[
+$$
 |u_{t+1}-\hat{u}_{t+1}|
-]
+$$
 
-### Multi-Step Stability
+Multi-step stability
 
-[
+$$
 |u_{t+k}-\hat{u}_{t+k}|
-]
+$$
 
-### Spectral Energy Preservation
+Spectral energy
 
-[
+$$
 E(k)=|\hat{u}_k|^2
-]
+$$
 
-### Uncertainty Calibration
-
-Compare:
-
-* ensemble mean
-* empirical variance
+Uncertainty calibration via ensemble spread.
 
 ---
 
-## 12. Relevance to PhysiNet-Operator
+## 1️⃣2️⃣ Relevance to PhysiNet-Operator
 
 This framework supports:
 
 ✅ probabilistic neural operators
-✅ resolution-invariant learning
-✅ PDE-consistent rollouts
+✅ physics-informed learning
+✅ resolution-invariance
 ✅ scientific interpretability
 
 and forms the **theoretical backbone** of the project.
 
 ---
 
-## Suggested Reading
+## 📚 Suggested Reading
 
-* Li et al. — Fourier Neural Operator
-* Karniadakis — Physics-Informed ML
-* Goldenfeld — Statistical Physics of Fields
-* Rasmussen — Gaussian Processes
+* Fourier Neural Operator — Li et al.
+* Physics-Informed ML — Karniadakis
+* Statistical Physics of Fields — Goldenfeld
+* Gaussian Processes — Rasmussen
+
+---
